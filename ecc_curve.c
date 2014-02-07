@@ -1,12 +1,27 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include "ecc_curve.h"
 
-typedef struct ecc_point{
-	int x,y;
-} ecc_point;
+int init_curve(int a, int b,int prime, int order,int cofactor,ecc_point g){
+	a=a;
+	b=b;
+	prime=prime;
+	generator_point = g;
+	n= order;
+	h= cofactor;
+	if ( isPoint(g))
+		return 0;
+	else
+		return -1;
+}
 
-int a;
-ecc_point INFINITY_POINT;
-ecc_point* mult(ecc_point p, int value);
+
+int isPoint(ecc_point p){
+	return (p.y== sqrt(pow(p.x,3) + a*p.x + b));
+}
+
+
 int main(){}
 
 
@@ -17,7 +32,7 @@ ecc_point* sum(ecc_point p1,ecc_point p2){
 		result=mult(p1,2);
 	else
 		if( (p1.x==p2.x)&&(p2.y==-p1.y))
-			(*result)=INFINITY_POINT;
+			result=INFINITY_POINT;
 		else{
 			int s= (p1.y-p2.y)/(p1.x-p2.x);
 			(*result).x= s*s - p1.x - p2.x;
@@ -35,7 +50,7 @@ ecc_point* double_p(ecc_point p){
 		(*result).y=-p.y + s*(p.x-(*result).x);
 
 	}else
-		result=&INFINITY_POINT;
+		result=INFINITY_POINT;
 	return result;
 }
 
