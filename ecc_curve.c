@@ -22,8 +22,6 @@ int isPoint(ecc_point p){
 }
 
 
-int main(){}
-
 
 ecc_point* sum(ecc_point p1,ecc_point p2){
 	ecc_point* result;
