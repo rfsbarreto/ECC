@@ -10,15 +10,23 @@ int init_curve(int a, int b,int prime, int order,int cofactor,ecc_point g){
 	generator_point = g;
 	n= order;
 	h= cofactor;
-	if ( isPoint(g))
+	if ( existPoint(g.x))
 		return 0;
 	else
 		return -1;
 }
 
 
-int isPoint(ecc_point p){
-	return (p.y== sqrt(pow(p.x,3) + a*p.x + b));
+ecc_point* existPoint(long long  p){
+//	return (p.y== sqrt(pow(p.x,3) + a*p.x + b));
+	long long l = sqrt(pow(p,3)+ a*p + b);
+	if (round(l)==l){
+		ecc_point* result= malloc( sizeof(ecc_point));
+		(*result).x=p;
+		(*result).y=l;		
+		return result;;
+	}else
+		return NULL;
 }
 
 

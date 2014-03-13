@@ -3,7 +3,8 @@
 
 // Ponto de uma curva Elíptica
 typedef struct ecc_point{
-	int x,y;
+	long long  x,y;
+
 } ecc_point;
 
 
@@ -37,6 +38,11 @@ ecc_point* sum(ecc_point p1,ecc_point p2);
 //Função de verificação de Pontos.
 // retorna 1  se um dado ponto pertence à curva, 0 do contrário
 int isPoint(ecc_point p);
+
+
+//Função que verifica se existe um ponto dada uma determinada coordenada x, e retorna NULL caso contrário
+ecc_point* existPoint(long long x);
+
 
 //Função para dobrar(*2) um ponto da curva
 //Retorno: Dobro do ponto passado por parâmetro, que também é um ponto da curva
