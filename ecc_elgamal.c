@@ -70,11 +70,14 @@ int main(int argc, char** argv){
 //	printf("%s",a);
 	p= fopen(argv[1],"r");
 
-	int prime,a,b,x,order;
+	char* prime_c,a_c,b_c,x_c,order_c;
 	ecc_point* generator,publicKey;
-	fscanf(p,"%llu",&prime);
-	fscanf(p,"%llu",&a);
-	fscanf(p,"%llu",&b);
+	fscanf(p,"%s",&prime);
+	fscanf(p,"%s",&a);
+	fscanf(p,"%s",&b);
+
+	mpz_t prime,a,b,x,order;
+	mpz_init_set_str(prime,prime_c,10);
 
 	//geração das chaves
 	int privateKey = random_in_range(0,order);
