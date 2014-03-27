@@ -2,13 +2,15 @@
 #include <stdlib.h>
 #include <math.h>
 #include "ecc_curve.h"
-#include<gmp.h>
 
-int a,b=5,prime,order,cofactor;
-ecc_point generator_point;
+#define BASE_16 16
+
+//mpz_t a,b,prime,order;
+//int cofactor;
+//ecc_point generator_point;
 
 
-
+/*
 int modularinverse( int aux, int prime){
 	int c=b/a,x=0;
 	do{
@@ -20,23 +22,117 @@ int modularinverse( int aux, int prime){
 	printf("invmd: %d \n",x);
 	return x;
 }
+*/
+int init_curve(char* a1, char* b1,char* prime1, char* order1,int cofactor1,ecc_point g1){
+//	a=a1;
+	mpz_init_set_str(a,a1,BASE_16);
+	mpz_init_set_str(b,b1,BASE_16);
+	mpz_init_set_str(prime,prime1,BASE_16);
+	mpz_init_set_str(order,order1,BASE_16);
 
-int init_curve(int a1, int b1,int prime1, int order1,int cofactor1,ecc_point g1){
-	a=a1;
 	//printf("%d\n ",b);
-	b=b1;
+	//b=b1;
 	//printf("%d\n ",b);
-	prime=prime1;
+/*	prime=prime1;
 	generator_point = g1;
-	n= order1;
-	h= cofactor1;
+	n= order1;*/
+	cofactor= cofactor1;
 	if ( existPoint1(g1.x,g1.y))
 		return 0;
 	else
 		return -1;
 }
 
+int existPoint1(mpz_t x, mpz_t  y){
+	mpz_t exp,eq_result;
+	mpz_init(eq_result);  //Equation Result
+	mpz_init(exp); //Exponentiation Result
+	mpz_pow_ui(exp,x,3);
+	mpz_addmul(exp,x,a);
+//	mpz_add(eq_result,eq_result,exp);
+	mpz_add(exp,exp,b);	
+//	long long soma = pow(x,3)+ a*x + b;
+	mpz_mod(exp,exp,prime);
+	if (mpz_perfect_square_p(exp)){
+		mpz_sqrt(eq_result,x);
+		if (mpz_cmp(y,eq_result)==0)
+			return 1;
+	}else
+		return 0;	
+//	long long resultado= sqrt( ((int) soma)%prime );  
+//	printf("%llu %lld %f \n",l,x,sqrt(pow(x,3)+ a*x + b));
+	
+//	return y== resultado || y==prime - resultado   ;
+}
 
+ecc_point* sum(ecc_point p1,ecc_point p2){
+	ecc_point* result;
+//	printf("primo: %d a:%d b:%d\n\n",prime,a,b);
+	result = malloc(sizeof(ecc_point));
+	mpz_init((*result).x);
+	mpz_init((*result).y);
+	if (mpz_cmp(p1.x,p2.x)==0 && mpz_cmp(p1.y,p2.y)==0)
+		result=NULL;//mult(p1,2);
+	else
+		if( mpz_cmp(p1.x,p2.x)==0 && mpz_cmpabs(p2.y,p1.y)==0)
+			result=INFINITY_POINT;
+		else{
+			mpz_t delta_x,x,y,delta_y,s,s_2;
+			mpz_init(delta_x);
+			mpz_init(x); mpz_init(y);
+			mpz_init(s); mpz_init(s_2);
+			mpz_init(delta_y);
+			mpz_sub(delta_x,p1.x,p2.x);
+			gmp_printf("Deltax: %Zd \n",delta_x);
+			mpz_sub(delta_y,p1.y,p2.y);
+			gmp_printf("Deltay: %Zd \n",delta_y);
+			mpz_mod(delta_x,delta_x,prime);
+			gmp_printf("Deltax/prime: %Zd \n",delta_x);
+			mpz_invert(delta_x,delta_x,prime);
+			gmp_printf("Modulo_inv: %Zd \n",delta_x);
+			mpz_mul(s,delta_x,delta_y);
+			mpz_mod(s,s,prime);
+			gmp_printf("S: %Zd \n",s);
+			mpz_pow_ui(s_2,s,2);
+			gmp_printf("S^2: %Zd \n",s_2);
+			mpz_sub(x,s_2,p1.x);
+			gmp_printf("%Zd \n",delta_x);
+			mpz_sub(x,x,p2.x);
+			mpz_mod(x,x,prime);
+//			long long x= (( s*s - p1.x - p2.x))%prime;
+			mpz_set((*result).x,x);
+//			printf("s:%d prime:%d x:%lld result.x:%lld \n",s,prime,x,(*result).x);
+			gmp_printf("%Zd \n",x);
+			mpz_sub(delta_x,p2.x,x);
+			mpz_neg(y,p2.y);
+			mpz_addmul(y,s,delta_x);
+			mpz_mod(y,y,prime);
+			gmp_printf("%Zd \n",y);
+
+		//	long long y=(( -p2.y + s*(p2.x-(*result).x)))%prime;	
+			mpz_set((*result).y,y);
+		};
+	return result;	
+}
+
+ecc_point* double_p(ecc_point p){
+	ecc_point* result;
+	result= malloc(sizeof(ecc_point));
+	mpz_init((*result).x);
+	mpz_init((*result).y);
+	if (mpz_cmp(p.y,0)!=0){
+		
+
+/*		int s= (3*p.x*p.x + a)/( 2*p.y);
+		(*result).x=s*s -2* p.x;
+		(*result).y=-p.y + s*(p.x-(*result).x);
+*/
+	}else
+		result=INFINITY_POINT;
+	return result;
+}
+
+/*
 ecc_point* existPoint(long long  p){
 //	return (p.y== sqrt(pow(p.x,3) + a*p.x + b));
 	//printf("%d\n",b);
@@ -51,36 +147,8 @@ ecc_point* existPoint(long long  p){
 		return NULL;
 }
 
-int existPoint1(long long x, long long y){
-	long long soma = pow(x,3)+ a*x + b;
-	long long resultado= sqrt( ((int) soma)%prime );  
-//	printf("%llu %lld %f \n",l,x,sqrt(pow(x,3)+ a*x + b));
-	
-	return y== resultado || y==prime - resultado   ;
-}
 
 
-
-ecc_point* sum(ecc_point p1,ecc_point p2){
-	ecc_point* result;
-//	printf("primo: %d a:%d b:%d\n\n",prime,a,b);
-	result = malloc(sizeof(ecc_point));
-	if ((p1.x==p2.x) && (p1.y==p2.y))
-		result=mult(p1,2);
-	else
-		if( (p1.x==p2.x)&&(p2.y==-p1.y))
-			result=INFINITY_POINT;
-		else{
-			int delta_x=(p1.x-p2.x);
-			int s= ((p1.y-p2.y)* modularinverse((delta_x>=0?delta_x:prime+delta_x),prime))%prime;
-			long long x= (( s*s - p1.x - p2.x))%prime;
-			(*result).x= x>=0?x:prime+x;
-//			printf("s:%d prime:%d x:%lld result.x:%lld \n",s,prime,x,(*result).x);
-			long long y=(( -p2.y + s*(p2.x-(*result).x)))%prime;	
-			(*result).y= y>=0?y:prime+y;
-		};
-	return result;	
-}
 
 ecc_point* double_p(ecc_point p){
 	ecc_point* result;
@@ -109,4 +177,4 @@ ecc_point* mult(ecc_point p, int value){
 	}
 	return result;
 
-}
+} */

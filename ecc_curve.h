@@ -1,9 +1,9 @@
 #include <stdio.h>
-
+#include<gmp.h>
 
 // Ponto de uma curva Elíptica
 typedef struct ecc_point{
-	long long  x,y;
+	mpz_t x,y;
 
 } ecc_point;
 
@@ -14,8 +14,8 @@ typedef struct ecc_point{
 // prime é o número primo que define o tamanho(teto) do Grupo
 // n é a ordem da curva
 //h é o cofator  
-int a,b,prime,n,h;
-
+mpz_t a,b,prime,order;
+int cofactor; 
 //Ponto gerador utilizado nos algoritmos do ECC
 ecc_point generator_point;
 
@@ -24,7 +24,7 @@ ecc_point* INFINITY_POINT=NULL;
 
 //Função de inicialização dos Parâmetros da curva
 // Retorna 0 se foi concluída sem erros, -1 do contrário
-int init_curve(int a, int b, int prime, int order, int cofactor, ecc_point g);
+int init_curve(char* a, char* b, char* prime, char* order, int cofactor, ecc_point g);
 
 //Função de multiplicação de um ponto na curva por um escalar 
 //Retorna: Resultado da multiplicação, que também é um ponto da curva
