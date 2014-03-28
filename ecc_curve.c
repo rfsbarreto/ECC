@@ -121,8 +121,24 @@ ecc_point* double_p(ecc_point p){
 	mpz_init((*result).x);
 	mpz_init((*result).y);
 	if (mpz_cmp(p.y,0)!=0){
-		
-
+		mpz_t s,d_y,d_x,y;
+		mpz_init(d_y);
+		mpz_init(s);
+		mpz_init(y);
+		mpz_pow_ui(s,p.x,2);
+		mpz_mul_si(s,s,3);
+		mpz_mul_si(d_y,p.y,2);
+		mpz_mod(d_y,d_y,prime);
+		mpz_invert(d_y,d_y,prime);
+		mpz_mul(s,s,d_y);
+		mpz_mod(s,s,prime);		
+		mpz_pow_ui(d_x,p.x,2);
+		mpz_pow_ui((*result).x,s,2);
+		mpz_sub((*result).x,(*result).x,d_x);
+		mpz_neg((*result).y,p.y);
+		mpz_sub(d_x,p.x,(*result).x);
+		mpz_mul(s,s,d_x);
+		mpz_add((*result).y,(*result).y,s);
 /*		int s= (3*p.x*p.x + a)/( 2*p.y);
 		(*result).x=s*s -2* p.x;
 		(*result).y=-p.y + s*(p.x-(*result).x);
