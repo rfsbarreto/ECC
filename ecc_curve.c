@@ -160,6 +160,22 @@ ecc_point* double_p(ecc_point p){
 	return result;
 }
 
+ecc_point* mult(ecc_point p, int value){
+	ecc_point* result ;
+	result =malloc(sizeof(ecc_point));
+//	result=p;
+	int aux=value;
+	if (aux!=0){
+	//	ecc_point p1= mult(result,
+		if (aux%2 != 0 )
+			result = sum(p, (*mult(p,aux-1)));
+		else
+			result = double_p((*mult(p,aux/2)));
+	}
+	return result;
+
+} 
+
 /*
 ecc_point* existPoint(long long  p){
 //	return (p.y== sqrt(pow(p.x,3) + a*p.x + b));
