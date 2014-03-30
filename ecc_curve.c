@@ -83,31 +83,31 @@ ecc_point* sum(ecc_point p1,ecc_point p2){
 			mpz_init(s); mpz_init(s_2);
 			mpz_init(delta_y);
 			mpz_sub(delta_x,p1.x,p2.x);
-			gmp_printf("Deltax: %Zd \n",delta_x);
+	//		gmp_printf("Deltax: %Zd \n",delta_x);
 			mpz_sub(delta_y,p1.y,p2.y);
-			gmp_printf("Deltay: %Zd \n",delta_y);
+	//		gmp_printf("Deltay: %Zd \n",delta_y);
 			mpz_mod(delta_x,delta_x,prime);
-			gmp_printf("Deltax/prime: %Zd \n",delta_x);
+	//		gmp_printf("Deltax/prime: %Zd \n",delta_x);
 			mpz_invert(delta_x,delta_x,prime);
-			gmp_printf("Modulo_inv: %Zd \n",delta_x);
+		//	gmp_printf("Modulo_inv: %Zd \n",delta_x);
 			mpz_mul(s,delta_x,delta_y);
 			mpz_mod(s,s,prime);
-			gmp_printf("S: %Zd \n",s);
+		//	gmp_printf("S: %Zd \n",s);
 			mpz_pow_ui(s_2,s,2);
-			gmp_printf("S^2: %Zd \n",s_2);
+			//gmp_printf("S^2: %Zd \n",s_2);
 			mpz_sub(x,s_2,p1.x);
-			gmp_printf("%Zd \n",delta_x);
+		//	gmp_printf("%Zd \n",delta_x);
 			mpz_sub(x,x,p2.x);
 			mpz_mod(x,x,prime);
 //			long long x= (( s*s - p1.x - p2.x))%prime;
 			mpz_set((*result).x,x);
 //			printf("s:%d prime:%d x:%lld result.x:%lld \n",s,prime,x,(*result).x);
-			gmp_printf("%Zd \n",x);
+		//	gmp_printf("%Zd \n",x);
 			mpz_sub(delta_x,p2.x,x);
 			mpz_neg(y,p2.y);
 			mpz_addmul(y,s,delta_x);
 			mpz_mod(y,y,prime);
-			gmp_printf("%Zd \n",y);
+			//gmp_printf("%Zd \n",y);
 
 		//	long long y=(( -p2.y + s*(p2.x-(*result).x)))%prime;	
 			mpz_set((*result).y,y);
@@ -120,29 +120,41 @@ ecc_point* double_p(ecc_point p){
 	result= malloc(sizeof(ecc_point));
 	mpz_init((*result).x);
 	mpz_init((*result).y);
-	if (mpz_cmp(p.y,0)!=0){
+	printf("save point");
+	if (mpz_cmp_ui(p.y,0)!=0){
 		mpz_t s,d_y,d_x,y;
 		mpz_init(d_y);
 		mpz_init(s);
 		mpz_init(y);
+		mpz_init(d_x);
 		mpz_pow_ui(s,p.x,2);
+//		gmp_printf("s1:%Zd \n",s);
 		mpz_mul_si(s,s,3);
+//		gmp_printf("s2:%Zd \n",s);
+		mpz_add(s,s,a);
+//		gmp_printf("s3:%Zd \n",s);
 		mpz_mul_si(d_y,p.y,2);
 		mpz_mod(d_y,d_y,prime);
 		mpz_invert(d_y,d_y,prime);
+//		gmp_printf(" %Zd \n",d_y);
 		mpz_mul(s,s,d_y);
-		mpz_mod(s,s,prime);		
-		mpz_pow_ui(d_x,p.x,2);
+		mpz_mod(s,s,prime);	
+//		gmp_printf(" s4: %Zd",s);	
+		mpz_mul_ui(d_x,p.x,2);
 		mpz_pow_ui((*result).x,s,2);
+//		gmp_printf("r.x: %Zd \n",(*result).x);
+
+	//	mpz_mod((*result).x,(*result).x,prime);
 		mpz_sub((*result).x,(*result).x,d_x);
+		mpz_mod((*result).x,(*result).x,prime);
+//		gmp_printf(" x: %Zd ",(*result).x);
 		mpz_neg((*result).y,p.y);
 		mpz_sub(d_x,p.x,(*result).x);
 		mpz_mul(s,s,d_x);
 		mpz_add((*result).y,(*result).y,s);
-/*		int s= (3*p.x*p.x + a)/( 2*p.y);
-		(*result).x=s*s -2* p.x;
-		(*result).y=-p.y + s*(p.x-(*result).x);
-*/
+		mpz_mod((*result).y,(*result).y,prime);
+//		gmp_printf(" y: %Zd \n",(*result).y);
+
 	}else
 		result=INFINITY_POINT;
 	return result;
