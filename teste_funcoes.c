@@ -1,6 +1,6 @@
 #include<stdio.h>
-#include "ecc_curve.c"
-
+//#include "ecc_curve.c"
+#include "ecc_elgamal.c"
 
 
 
@@ -16,5 +16,7 @@ int main(){
 	gmp_printf("Soma: %Zd %Zd\n",(*r).x,(*r).y);
 	p2= double_p(*p);
 	gmp_printf(" Dobro: %Zd %Zd \n",(*p2).x,(*p2).y);	
+	p2=mult((*p),4);
+	gmp_printf(" 3x: %Zd %Zd \n",(*p2).x,(*p2).y);	
 
 }

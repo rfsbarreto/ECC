@@ -164,6 +164,10 @@ ecc_point* mult(ecc_point p, int value){
 	ecc_point* result ;
 	result =malloc(sizeof(ecc_point));
 //	result=p;
+	if (value==0)
+		return NULL;
+	if (value==1)
+		return (&p);
 	int aux=value;
 	if (aux!=0){
 	//	ecc_point p1= mult(result,
@@ -176,6 +180,48 @@ ecc_point* mult(ecc_point p, int value){
 
 } 
 
+ecc_point* existPoint(mpz_t  p){
+//	return (p.y== sqrt(pow(p.x,3) + a*p.x + b));
+	//printf("%d\n",b);
+	mpz_t l;
+	mpz_init(l);
+	mpz_pow_ui(l,p,3);
+	mpz_addmul(l,a,p);
+	mpz_add(l,l,b);
+	mpz_mod(l,l,prime);
+	mpz_t i;
+	mpz_init_set_ui(i,0);
+	while(mpz_cmp(i,l)!=0){
+		mpz_t y;
+		mpz_init_set(y,i);
+		mpz_pow_ui(y,y,2);
+		mpz_mod(y,y,prime);
+		if (mpz_cmp(y,l)==0){
+			ecc_point* r= malloc(sizeof(ecc_point));
+			mpz_init_set((*r).x,l);
+			mpz_init_set((*r).y,y);
+		}else
+			mpz_add_ui(i,i,1);
+	}
+	return NULL;
+		
+//	if (!mpz_perfect_square_p(l)){
+//		return NULL;
+	}
+/*else{
+		mpz
+		mpz_sqrt(l,l);
+		mpz_= sqrt(pow(p,3)+ a*p + b);
+		printf("%llu %d %f \n",l,b,sqrt(pow(p,3)+ a*p + b));
+		if (round(l)==l){
+			ecc_point* result= malloc( sizeof(ecc_point));
+			(*result).x=p;
+			(*result).y=l;		
+			return result;;
+		}else
+			return NULL;
+	}
+}*/
 /*
 ecc_point* existPoint(long long  p){
 //	return (p.y== sqrt(pow(p.x,3) + a*p.x + b));

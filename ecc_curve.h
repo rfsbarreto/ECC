@@ -41,7 +41,7 @@ int isPoint(ecc_point p);
 
 
 //Função que verifica se existe um ponto dada uma determinada coordenada x, e retorna NULL caso contrário
-ecc_point* existPoint(long long x);
+ecc_point* existPoint(mpz_t x);
 
 
 //Função para dobrar(*2) um ponto da curva
