@@ -3,10 +3,10 @@
 #include <time.h>
 #include "ecc_curve.c"
 
-char  *pot_256[20] ={"1", "100", "10000", "1000000", "100000000", "10000000000", "1000000000000", "100000000000000",
+char  *pot_256[21] ={"1", "100", "10000", "1000000", "100000000", "10000000000", "1000000000000", "100000000000000",
  "10000000000000000", "1000000000000000000", "100000000000000000000", "10000000000000000000000", "1000000000000000000000000",
  "100000000000000000000000000","10000000000000000000000000000", "1000000000000000000000000000000", "100000000000000000000000000000000",
- "10000000000000000000000000000000000", "1000000000000000000000000000000000000", "100000000000000000000000000000000000000"};
+ "10000000000000000000000000000000000","1000000000000000000000000000000000000","100000000000000000000000000000000000000","10000000000000000000000000000000000000000"};
  /*{"1", "256", "65536", "16777216", "4294967296", "1099511627776", "281474976710656", "72057594037927936", "18446744073709551616",
  "4722366482869645213696", "1208925819614629174706176", "309485009821345068724781056", "79228162514264337593543950336", "20282409603651670423947251286016",
  "5192296858534827628530496329220096", "1329227995784915872903807060280344576", "340282366920938463463374607431768211456", "87112285931760246646623899502532662132736",
@@ -45,9 +45,14 @@ message_point* getECCPointFromMessage(char* message){ //,long long primo){
 	for (i;i>=0;i--){
 		mpz_t temp;
 		mpz_init_set_str(temp,pot_256[i],16);
-		mpz_addmul(x,temp,(*message));
+		mpz_addmul_ui(x,temp,(*message));
+		printf("%d       ",(*message));
 		++message;
+		if (!(*message))
+			break;
 	}
+	gmp_printf("fase 1 x= %Zd\n",x);
+	
 //	x = (*message * 72057594037927936) + (*message<<8 * 281474976710656) + (*message<<8 *1099511627776) +(*message<<8 * 4294967296)+
 //	(*message<<8 * 16777216) + (*message<<8 *65536) + ( *message<<8 * 256) + (*message); 
 //Não apliquei o módulo pois o primo escolhido como parametro estoura os 64 bits, desta forma o resultado do módulo sempre seria o próprio valor de x
@@ -57,12 +62,15 @@ message_point* getECCPointFromMessage(char* message){ //,long long primo){
 //		return result;
 //	}else{
 	i=0;
+	mpz_mod(x,x,prime);
 	do{
 		result= existPoint(x);
 		i++;
 		mpz_add_ui(x,x,1);
 		mpz_mod(x,x,prime);
-	} while(result!=NULL); 
+	} while(result==NULL); 
+	gmp_printf("fase 2 Ponto: %Zd %Zd \n",(*result).x,(*result).y);
+	
 	if (result){
 		m = malloc(sizeof(message_point));
 		(*m).p= result;
@@ -79,10 +87,12 @@ char* getMessageFromPoint(message_point* m){
 	for (i;i<20;i++){
 //		message[i]= (  (*(*m).p).x   << i*8   )  >> (56);
 		mpz_sub_ui((*(*m).p).x,(*(*m).p).x,(*m).qtd_adicoes);
+		mpz_t pot;
+		mpz_init_set_str(pot,pot_256[20-i],16);
+		mpz_and((*(*m).p).x,(*(*m).p).x,pot);
 		mpz_t aux;
 		mpz_init(aux);
-		mpz_t pot;
-		mpz_init_set_str(pot,pot_256[19-i],16);
+		mpz_set_str(pot,pot_256[19-i],16);
 		mpz_fdiv_q(aux,(*(*m).p).x,pot);
 		message[i]=mpz_get_ui(aux);
 
@@ -91,28 +101,41 @@ char* getMessageFromPoint(message_point* m){
 }
 
 int main(int argc, char** argv){
-	FILE* p;
+//	FILE* p;
 //	char* f=argv[1];
 //	printf("%s",a);
-	p= fopen(argv[1],"r");
+/*	p= fopen(argv[1],"r");
 
 	char* prime_c,a_c,b_c,x_c,order_c;
 	ecc_point* generator,publicKey;
-	gmp_fscanf(p,"%Zd",prime);
-	gmp_fscanf(p,"%Zd",a);
-	gmp_fscanf(p,"%Zd",b);
+	fscanf(p,"%Zd",prime);
+	fscanf(p,"%Zd",a);
+	fscanf(p,"%Zd",b);
 
 	mpz_t prime,a,b,x,order;
 	mpz_init_set_str(prime,prime_c,10);
-
+	mpz_init_set_str(a,a_c,10);
+	mpz_init_set_str(b,b_c,10);
+	
+*/
+	ecc_point* p=malloc(sizeof(ecc_point));
+	mpz_init_set_ui((*p).x,0);
+	mpz_init_set_ui((*p).y,1);	
+	message_point* m = malloc(sizeof(message_point));
+	(*m).p=p;
+	(*m).qtd_adicoes=0;
+	
+	init_curve("1","1","101","90",1,*p);
 	//geração das chaves
-	int privateKey = random_in_range(0,order);
+/*	int privateKey = random_in_range(0,order);
 	ecc_point* publicKey1;
 	publicKey1 = mult(*generator,privateKey);
-
+*/
 	//encriptação
-	char* message = "teste";
-	message_point* m = getECCPointFromMessage(message);
+	char* message ="8aa";// getMessageFromPoint(m);
+	printf("Mensagem: %s",message);
+
+	 m = getECCPointFromMessage(message);
 
 //	int k =  random_in_range(0,order-1);
 //	ecc_point* c1 = mult(*generator,k);
@@ -126,5 +149,5 @@ int main(int argc, char** argv){
 //	(*m1).p=sum(*c2,/**mult(*c1,privateKey)*/  *aux); 
 //	(*m1).qtd_adicoes= (*m).qtd_adicoes;
 //	char* M= getMessageFromPoint(m1);
-
 }
+

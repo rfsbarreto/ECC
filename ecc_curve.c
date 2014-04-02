@@ -51,14 +51,21 @@ int existPoint1(mpz_t x, mpz_t  y){
 	mpz_addmul(exp,x,a);
 //	mpz_add(eq_result,eq_result,exp);
 	mpz_add(exp,exp,b);	
+	gmp_printf("%Zd x \n",exp);
 //	long long soma = pow(x,3)+ a*x + b;
 	mpz_mod(exp,exp,prime);
-	if (mpz_perfect_square_p(exp)){
-		mpz_sqrt(eq_result,x);
-		if (mpz_cmp(y,eq_result)==0)
-			return 1;
-	}else
-		return 0;	
+//	if (mpz_perfect_square_p(exp)){
+//	mpz_sqrt(eq_result,x);
+//		if (mpz_cmp(y,eq_result)==0)
+//			return 1;
+//	}else
+//		return 0;	
+	mpz_pow_ui(eq_result,y,2);
+	mpz_mod(eq_result,eq_result,prime);
+	if (mpz_cmp(eq_result,exp)==0)
+		return 1;
+	else
+		return 0;
 //	long long resultado= sqrt( ((int) soma)%prime );  
 //	printf("%llu %lld %f \n",l,x,sqrt(pow(x,3)+ a*x + b));
 	
@@ -191,15 +198,16 @@ ecc_point* existPoint(mpz_t  p){
 	mpz_mod(l,l,prime);
 	mpz_t i;
 	mpz_init_set_ui(i,0);
-	while(mpz_cmp(i,l)!=0){
+	while(mpz_cmp(i,prime)!=0){
 		mpz_t y;
 		mpz_init_set(y,i);
 		mpz_pow_ui(y,y,2);
 		mpz_mod(y,y,prime);
 		if (mpz_cmp(y,l)==0){
 			ecc_point* r= malloc(sizeof(ecc_point));
-			mpz_init_set((*r).x,l);
-			mpz_init_set((*r).y,y);
+			mpz_init_set((*r).x,p);
+			mpz_init_set((*r).y,i);
+			return r;
 		}else
 			mpz_add_ui(i,i,1);
 	}
