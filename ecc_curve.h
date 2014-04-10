@@ -28,7 +28,7 @@ int init_curve(char* a, char* b, char* prime, char* order, int cofactor, ecc_poi
 
 //Função de multiplicação de um ponto na curva por um escalar 
 //Retorna: Resultado da multiplicação, que também é um ponto da curva
-ecc_point* mult(ecc_point p, int value);
+ecc_point* mult(ecc_point p, mpz_t  value);
 
 
 //Função da soma de dois pontos da curva
