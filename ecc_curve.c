@@ -127,7 +127,7 @@ ecc_point* double_p(ecc_point p){
 	result= malloc(sizeof(ecc_point));
 	mpz_init((*result).x);
 	mpz_init((*result).y);
-	printf("save point");
+	printf("DP ");
 	if (mpz_cmp_ui(p.y,0)!=0){
 		mpz_t s,d_y,d_x,y;
 		mpz_init(d_y);
@@ -169,23 +169,27 @@ ecc_point* double_p(ecc_point p){
 
 ecc_point* mult(ecc_point p, mpz_t value){
 	ecc_point* result ;
+//	printf("/");
 	result =malloc(sizeof(ecc_point));
 //	result=p;
 	if (mpz_cmp_ui(value,0)==0)
 		return NULL;
-	if (mpz_cmp_ui(value,1)==1)
+	if (mpz_cmp_ui(value,1)==0)
 		return (&p);
+	if (mpz_cmp_ui(value,2)==0)
+		return double_p(p);
 	mpz_t aux;//=value;
 	mpz_init_set(aux,value);
 	if (mpz_cmp_ui(value,0)!=0){
 	//	ecc_point p1= mult(result,
 		mpz_mod_ui(aux,aux,2);
 		if (mpz_cmp_ui(aux,0) != 0 ){
-			mpz_sub_ui(aux,aux,1);
-			result = sum(p, (*mult(p,aux)));
+			mpz_sub_ui(value,value,1);
+			result = sum(p, (*mult(p,value)));
 		}else{
-			mpz_div_ui(aux,aux,2);
-			result = double_p((*mult(p,aux)));
+			mpz_set(aux,value);
+			mpz_div_ui(value,value,2);
+			result = double_p((*mult(p,value)));
 		}
 	}
 	return result;
