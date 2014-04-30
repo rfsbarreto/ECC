@@ -37,9 +37,10 @@ int init_curve(char* a1, char* b1,char* prime1, char* order1,int cofactor1,ecc_p
 	generator_point = g1;
 	n= order1;*/
 	cofactor= cofactor1;
-	if ( existPoint1(g1.x,g1.y))
+	if ( existPoint1(g1.x,g1.y)){
+		generator_point=g1;
 		return 0;
-	else
+	}else
 		return -1;
 }
 
