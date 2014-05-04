@@ -174,12 +174,14 @@ int main(int argc, char** argv){
 	gmp_randinit_default(st);
 	gmp_randseed_ui(st,time(NULL));
 	mpz_urandomm(random, st, order);
+	gmp_printf(" random: %Zd %Zd",random,order);
 
 	mpz_t  privateKey;
 	mpz_init_set(privateKey,random); // = random_in_range(0,order);
+	gmp_printf(" pvt: %Zd \n",privateKey);
 	ecc_point* publicKey1;
-	publicKey1 = mult(*generator,privateKey);
-
+	publicKey1 = mult(generator_point,privateKey);
+	gmp_printf(" pK.x: %Zd pK.Y:%Zd priv: %Zd \n",(*publicKey1).x,(*publicKey1).y,privateKey);
 	//encriptação
 	printf("mensagem: ");
 	scanf("%[0-9a-zA-Z ]s",message);// ="8aa";// getMessageFromPoint(m);
@@ -200,28 +202,30 @@ int main(int argc, char** argv){
 	gmp_randseed_ui(st,time(NULL));
 	mpz_urandomm(random, st, order);
 	gmp_printf(" random: %Zd %Zd",random,order);
+	mpz_set_ui(random,2);
 /*	gmp_randclear(st);
 */	
 //	int k =  random_in_range(0,order-1);
 	ecc_point* c1 = mult(generator_point,random);
-	ecc_point* aux=mult(*publicKey1,random);
-	gmp_printf("aux.x %Zd aux.y %Zd \n",(*c1).x,(*c1).y);
+	ecc_point* aux1=mult(*publicKey1,random);
+	gmp_printf("aux.x %Zd aux.y %Zd \n",(*aux1).x,(*aux1).y);
 	gmp_printf("C1.x %Zd C1.y %Zd\n",(*c1).x,(*c1).y);
 
 	//if (!aux)
 	//	printf("aa\n");
 //	sum((*(*m).p),(*(*m).p));
-	ecc_point* c2 = sum((*(*m).p) ,(*aux));
+	gmp_printf("C1.x %Zd C1.y %Zd\n",(*c1).x,(*c1).y);
+	ecc_point* c2 = sum((*(*m).p), (*aux1));
 //	gmp_printf("C1.x %Zd C1.y %Zd\n",(*c1).x,(*c1).y);
 
 	gmp_printf("C2.x %Zd C2.y %Zd\n",(*c2).x,(*c2).y);
 
 	//return (c1,c2)					
-	printf(" Fim encriptacao\n");
+	gmp_printf(" Fim encriptacao %Zd\n",(*c1).x);
 	
 	//decriptacao
-	aux = mult(*c1,privateKey);
-	gmp_printf("priv: %Zd aux.x %Zd aux.y %Zd\n",privateKey,(*aux).x,(*aux).y);
+	ecc_point *aux = mult(*c1,privateKey);
+	gmp_printf("priv: %Zd c1.x %Zd aux.x %Zd aux.y %Zd\n",privateKey,(*c1).x,(*aux).x,(*aux).y);
 	mpz_neg((*aux).y,(*aux).y);
 //	gmp_printf(
 //	(*aux).y=( (*aux).y* -1 ) % prime;

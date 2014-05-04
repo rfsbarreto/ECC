@@ -80,7 +80,7 @@ ecc_point* sum(ecc_point p1,ecc_point p2){
 	mpz_init((*result).x);
 	mpz_init((*result).y);
 	if (mpz_cmp(p1.x,p2.x)==0 && mpz_cmp(p1.y,p2.y)==0)
-		result=NULL;//mult(p1,2);
+		result=double_p(p1);//NULL;//mult(p1,2);
 	else
 		if( mpz_cmp(p1.x,p2.x)==0 && mpz_cmpabs(p2.y,p1.y)==0)
 			result=INFINITY_POINT;
@@ -179,18 +179,19 @@ ecc_point* mult(ecc_point p, mpz_t value){
 		return (&p);
 	if (mpz_cmp_ui(value,2)==0)
 		return double_p(p);
-	mpz_t aux;//=value;
+	mpz_t aux,aux1;//=value;
 	mpz_init_set(aux,value);
-	if (mpz_cmp_ui(value,0)!=0){
+	mpz_init_set(aux1,value);
+	if (mpz_cmp_ui(aux,0)!=0){
 	//	ecc_point p1= mult(result,
 		mpz_mod_ui(aux,aux,2);
 		if (mpz_cmp_ui(aux,0) != 0 ){
-			mpz_sub_ui(value,value,1);
-			result = sum(p, (*mult(p,value)));
+			mpz_sub_ui(aux1,aux1,1);
+			result = sum(p, (*mult(p,aux1)));
 		}else{
 			mpz_set(aux,value);
-			mpz_div_ui(value,value,2);
-			result = double_p((*mult(p,value)));
+			mpz_div_ui(aux1,aux1,2);
+			result = double_p((*mult(p,aux1)));
 		}
 	}
 	return result;
