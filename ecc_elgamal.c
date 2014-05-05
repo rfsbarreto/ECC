@@ -88,9 +88,14 @@ message_point* getECCPointFromMessage(char* message){ //,long long primo){
 //	return NULL;
 }
 
-char* getMessageFromPoint(message_point* m){
+char* getMessageFromPoint(message_point* msg){
 	char* message= malloc(MSG_BYTES_MAX*sizeof(char));
 	int i=MSG_BYTES_MAX ;
+	message_point* m=malloc(sizeof(message_point));
+	(*m).p=malloc(sizeof(ecc_point));
+	mpz_set((*(*m).p).x,(*(*msg).p).x);
+	mpz_set((*(*m).p).y,(*(*msg).p).y);
+	(*m).qtd_adicoes=(*msg).qtd_adicoes;
 	gmp_printf("X: %Zd ",(*(*m).p).x); 
 	mpz_sub_ui((*(*m).p).x,(*(*m).p).x,(*m).qtd_adicoes);
 /*	for (i;i>=0;i--){
@@ -208,7 +213,7 @@ int main(int argc, char** argv){
 //	int k =  random_in_range(0,order-1);
 	ecc_point* c1 = mult(generator_point,random);
 	ecc_point* aux1=mult(*publicKey1,random);
-	gmp_printf("aux.x %Zd aux.y %Zd \n",(*aux1).x,(*aux1).y);
+	gmp_printf("aux.x %Zd aux.y %Zd Mp.x %Zd\n",(*aux1).x,(*aux1).y,(*(*m).p).x);
 	gmp_printf("C1.x %Zd C1.y %Zd\n",(*c1).x,(*c1).y);
 
 	//if (!aux)
@@ -234,9 +239,9 @@ int main(int argc, char** argv){
 
 	(*m1).p=sum(*c2,/**mult(*c1,privateKey)*/  *aux); 
 	(*m1).qtd_adicoes= (*m).qtd_adicoes;
-	gmp_printf("M1.x: %Zd M1.y: %Zd",(*(*m1).p).x,(*(*m1).p).y);
-	char* M;
-	printf(" tada: %s \n",getMessageFromPoint(m1));
+	gmp_printf("M1.x: %Zd M1.y: %Zd\n",(*(*m1).p).x,(*(*m1).p).y);
+//	char* M;
+	getMessageFromPoint(m1);
 //	printf("Mensagem final: %s \n",M);
 
 }
