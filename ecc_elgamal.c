@@ -36,13 +36,12 @@ int random_in_range (unsigned int min, unsigned int max)
   }
 }
 
-message_point* getECCPointFromMessage(char* message){ //,long long primo){
-//	int i =7;
+message_point* getECCPointFromMessage(char* message){ 
 	mpz_t x;
 	mpz_init(x);
 	message_point* m;
 	ecc_point* result;
-	int i=MSG_BYTES_MAX-1;  //19;
+	int i=MSG_BYTES_MAX-1;  
 	for (i;i>=0;i--){
 		mpz_t temp;
 		mpz_init_set_str(temp,pot_256[i],16);
@@ -51,24 +50,11 @@ message_point* getECCPointFromMessage(char* message){ //,long long primo){
 		printf(" m:%d \n",(*message));
 		++message;
 		if (!(*message)){
-		//	mpz_mod(x,x,prime);
 			break;
 		}
 	}
 	gmp_printf("fase 1 prime:%Zd x= %Zd\n",prime,x);
-	
-//	x = (*message * 72057594037927936) + (*message<<8 * 281474976710656) + (*message<<8 *1099511627776) +(*message<<8 * 4294967296)+
-//	(*message<<8 * 16777216) + (*message<<8 *65536) + ( *message<<8 * 256) + (*message); 
-//Não apliquei o módulo pois o primo escolhido como parametro estoura os 64 bits, desta forma o resultado do módulo sempre seria o próprio valor de x
-//	x = x % primo;
-//	ecc_point result= isPoint(x);
-//	if (result!=NULL){
-//		return result;
-//	}else{
 	i=0;
-//	mpz_mod(x,x,prime);
-//	gmp_printf("tudo bem %Zd \n",prime);
-//	scanf("%i",&i);
 	do{
 		result= existPoint(x);
 		i++;
@@ -84,8 +70,6 @@ message_point* getECCPointFromMessage(char* message){ //,long long primo){
 		return m;
 	}else
 		return NULL;
-
-//	return NULL;
 }
 
 char* getMessageFromPoint(message_point* msg){
@@ -93,29 +77,15 @@ char* getMessageFromPoint(message_point* msg){
 	int i=MSG_BYTES_MAX ;
 	message_point* m=malloc(sizeof(message_point));
 	(*m).p=malloc(sizeof(ecc_point));
-	mpz_set((*(*m).p).x,(*(*msg).p).x);
-	mpz_set((*(*m).p).y,(*(*msg).p).y);
+	mpz_init_set((*(*m).p).x,(*(*msg).p).x);
+	mpz_init_set((*(*m).p).y,(*(*msg).p).y);
 	(*m).qtd_adicoes=(*msg).qtd_adicoes;
-	gmp_printf("X: %Zd ",(*(*m).p).x); 
+	gmp_printf("X: %Zd \n",(*(*m).p).x); 
 	mpz_sub_ui((*(*m).p).x,(*(*m).p).x,(*m).qtd_adicoes);
-/*	for (i;i>=0;i--){
-		mpz_t temp;
-		mpz_init_set_str(temp,pot_256[i],16);
-		gmp_printf("temp: %Zd ",temp);
-//		mpz_addmul_ui(x,temp,(*message));
-//		printf(" m:%d \n",(*message));
-//		++message;
-//		if (!(*message)){
-		//	mpz_mod(x,x,prime);
-//			break;
-//		}
-	}*/
-		printf("\n\n");
+	printf("\n\n");
 	i=0;
 	for (i;i<MSG_BYTES_MAX;i++){
 		mpz_t pot;
-//		mpz_init(pot1);
-//		message[i]= (  (*(*m).p).x   << i*8   )  >> (56);
 		mpz_init_set_str(pot,pot_256[MSG_BYTES_MAX-i],16);
 		mpz_sub_ui(pot,pot,1);
 		gmp_printf("i:%d pot: %Zd \n",i,pot); 
@@ -135,9 +105,7 @@ char* getMessageFromPoint(message_point* msg){
 int main(int argc, char** argv){
 	FILE* f;
 	char* file=argv[1];
-//	printf("%s",a);
 	f= fopen(file,"r");
-
 	char prime_c[80],a_c[80],b_c[80],x_c[80],order_c[80],*message=malloc(200*sizeof(char));
 	message_point* m;
 	ecc_point* generator;
@@ -155,17 +123,6 @@ int main(int argc, char** argv){
 	gmp_fscanf(f,"%Zd ",(*generator).y);
 	fscanf(f,"%s ",order_c);
 	gmp_printf("leituras-> prime:%s, a:%s, b: %s, , order:%s ",prime_c,a_c,b_c,order_c);
-/*	mpz_t prime,a,b,x,order;
-	mpz_init_set_str(prime,prime_c,16);
-	mpz_init_set_str(a,a_c,16);
-	mpz_init_set_str(b,b_c,16);
-	gmp_printf("leituras-> prime:%Zd, a:%Zd, b: %Zd, ",prime,a,b);
-*/	
-
-//	ecc_point* a;
-//	a=malloc(sizeof(ecc_point));
-//	mpz_init_set_ui((*p).x,0);
-//	mpz_init_set_ui((*p).y,1);	
 	m = malloc(sizeof(message_point));
 	(*m).p=malloc(sizeof(ecc_point));
 	(*m).p=p;
@@ -182,17 +139,14 @@ int main(int argc, char** argv){
 	gmp_printf(" random: %Zd %Zd",random,order);
 
 	mpz_t  privateKey;
-	mpz_init_set(privateKey,random); // = random_in_range(0,order);
+	mpz_init_set(privateKey,random); 
 	gmp_printf(" pvt: %Zd \n",privateKey);
 	ecc_point* publicKey1;
 	publicKey1 = mult(generator_point,privateKey);
 	gmp_printf(" pK.x: %Zd pK.Y:%Zd priv: %Zd \n",(*publicKey1).x,(*publicKey1).y,privateKey);
 	//encriptação
 	printf("mensagem: ");
-	scanf("%[0-9a-zA-Z ]s",message);// ="8aa";// getMessageFromPoint(m);
-
-//	printf("Mensagem: %s",message);
-	
+	scanf("%[0-9a-zA-Z ]s",message);
 	m= getECCPointFromMessage(message);
 	if (!m){
 		printf("ERROR \n");
@@ -210,21 +164,13 @@ int main(int argc, char** argv){
 	mpz_set_ui(random,2);
 /*	gmp_randclear(st);
 */	
-//	int k =  random_in_range(0,order-1);
 	ecc_point* c1 = mult(generator_point,random);
 	ecc_point* aux1=mult(*publicKey1,random);
 	gmp_printf("aux.x %Zd aux.y %Zd Mp.x %Zd\n",(*aux1).x,(*aux1).y,(*(*m).p).x);
 	gmp_printf("C1.x %Zd C1.y %Zd\n",(*c1).x,(*c1).y);
-
-	//if (!aux)
-	//	printf("aa\n");
-//	sum((*(*m).p),(*(*m).p));
 	gmp_printf("C1.x %Zd C1.y %Zd\n",(*c1).x,(*c1).y);
 	ecc_point* c2 = sum((*(*m).p), (*aux1));
-//	gmp_printf("C1.x %Zd C1.y %Zd\n",(*c1).x,(*c1).y);
-
 	gmp_printf("C2.x %Zd C2.y %Zd\n",(*c2).x,(*c2).y);
-
 	//return (c1,c2)					
 	gmp_printf(" Fim encriptacao %Zd\n",(*c1).x);
 	
@@ -232,17 +178,11 @@ int main(int argc, char** argv){
 	ecc_point *aux = mult(*c1,privateKey);
 	gmp_printf("priv: %Zd c1.x %Zd aux.x %Zd aux.y %Zd\n",privateKey,(*c1).x,(*aux).x,(*aux).y);
 	mpz_neg((*aux).y,(*aux).y);
-//	gmp_printf(
-//	(*aux).y=( (*aux).y* -1 ) % prime;
 	message_point *m1 =  malloc( sizeof(message_point));
-//	(*m1).p= malloc(sizeof(ecc_point));
-
 	(*m1).p=sum(*c2,/**mult(*c1,privateKey)*/  *aux); 
 	(*m1).qtd_adicoes= (*m).qtd_adicoes;
 	gmp_printf("M1.x: %Zd M1.y: %Zd\n",(*(*m1).p).x,(*(*m1).p).y);
-//	char* M;
-	getMessageFromPoint(m1);
-//	printf("Mensagem final: %s \n",M);
+	printf("Mensagem final: %s \n",getMessageFromPoint(m1));
 
 }
 
