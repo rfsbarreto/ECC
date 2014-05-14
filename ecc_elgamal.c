@@ -127,7 +127,8 @@ int main(int argc, char** argv){
 	(*m).p=malloc(sizeof(ecc_point));
 	(*m).p=p;
 	(*m).qtd_adicoes=0;
-	
+	clock_t starttime, endtime;
+	starttime = clock();
 	init_curve(a_c,b_c,prime_c,order_c,1,*generator);
 	//geração das chaves
 	mpz_t random;
@@ -145,6 +146,7 @@ int main(int argc, char** argv){
 	publicKey1 = mult(generator_point,privateKey);
 	gmp_printf(" pK.x: %Zd pK.Y:%Zd priv: %Zd \n",(*publicKey1).x,(*publicKey1).y,privateKey);
 	//encriptação
+	
 	printf("mensagem: ");
 	scanf("%[0-9a-zA-Z ]s",message);
 	m= getECCPointFromMessage(message);
@@ -183,7 +185,8 @@ int main(int argc, char** argv){
 	(*m1).qtd_adicoes= (*m).qtd_adicoes;
 	gmp_printf("M1.x: %Zd M1.y: %Zd\n",(*(*m1).p).x,(*(*m1).p).y);
 	printf("Mensagem final: %s \n",getMessageFromPoint(m1));
-
+	endtime= clock();
+	printf("Execution time was %lu miliseconds\n", (endtime - starttime)/(CLOCKS_PER_SEC/1000));
 }
 
 
