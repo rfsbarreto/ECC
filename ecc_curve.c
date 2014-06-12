@@ -238,7 +238,7 @@ ecc_point* existPoint(mpz_t  p){
 
 		ecc_point* r= malloc(sizeof(ecc_point));
 		mpz_init_set((*r).x,p);
-		mpz_init_set((*r).y,i);
+		mpz_init_set((*r).y,y);
 		return r;
 	} else
 		return NULL;
