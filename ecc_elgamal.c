@@ -43,6 +43,10 @@ message_point* getECCPointFromMessage(char* message){
 	mpz_init(x);
 	message_point* m;
 	ecc_point* result;
+	printf("%s\n", message);
+	printf("%c\n", message[0]);
+	printf("%d", (*message));
+
 	int i=MSG_BYTES_MAX-1;  
 	for (i;i>=0;i--){
 		mpz_t temp;
@@ -99,7 +103,7 @@ char* getMessageFromPoint(message_point* msg){
 		mpz_set_str(pot,pot_256[MSG_BYTES_MAX-1-i],16);
 		mpz_fdiv_q(aux,(*(*m).p).x,pot);
 		printf(".%d.%c ",mpz_get_ui(aux),mpz_get_ui(aux));
-		message[i]=(mpz_get_ui(aux)>=20 && mpz_get_ui(aux)<127)?mpz_get_ui(aux):'\0';
+		message[i]=(mpz_get_ui(aux)>=32 && mpz_get_ui(aux)<127)?mpz_get_ui(aux):'\0';
 
 	}
 	message[MSG_BYTES_MAX]='\0';
@@ -152,7 +156,7 @@ int main(int argc, char** argv){
 	//encriptação
 	
 	printf("mensagem: ");
-	scanf("%[0-9a-zA-Z ]s",message);
+	scanf("%[ -~]s",message);
 	m= getECCPointFromMessage(message);
 	if (!m){
 		printf("ERROR \n");
