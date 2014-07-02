@@ -75,7 +75,7 @@ ep_mul_gen(myPublicKey, privKey);
 int main(int argc, char *argv[]) {
 ep_t a, b, c, t, publicPoint, auxPoint, messagePoint, otherPoint;
 bn_t privNumber, messageNumber, otherNumber, n;
-int i, size, index, used, t;
+int i, size, index, used;
 unsigned int fileSize;
 unsigned char message[MESSAGESIZE], otherMessage[MESSAGESIZE];
 FILE *entrada, *saida, *privateKey, *publicKey;
@@ -86,7 +86,7 @@ start_time = clock();
 if (argv[1][0] == 'C') {
 if (!(privateKey = fopen("PrivateKey.prk","w"))) {
 fprintf(stderr, "ERRO ao tentar abrir arquivo PrivateKey.prk\n"); }
-if (!(publicKey = fopen("PublicKey.puk","w")) {
+if (!(publicKey = fopen("PublicKey.puk","w"))) {
 fprintf(stderr, "ERRO ao tentar abrir arquivo PublicKey.puk\n"); }
 ep_param_set(NIST_P256);
 keysInit();
@@ -134,7 +134,7 @@ index = 0;
 //Criptografia de um bloco de mensagem.
 ep_null(messagePoint);
 ep_new(messagePoint);
-bn_read_bin(messageNumber, message, MESSAGESIZE, BN_POS);
+bn_read_bin(messageNumber, message, MESSAGESIZE);//, BN_POS);
 size = MESSAGESIZE-1;
 int m = 1;
 ep_curve_get_gen(messagePoint);
@@ -156,7 +156,7 @@ fileSize = 0;
 index = 0;
 ep_null(messagePoint);
 ep_new(messagePoint);
-bn_read_bin(messageNumber, message, MESSAGESIZE, BN_POS);
+bn_read_bin(messageNumber, message, MESSAGESIZE);//, BN_POS);
 ep_curve_get_gen(messagePoint);
 for(i=0;i<messageNumber->used;i++) {
 messagePoint->x[i] = messagePoint->x[i] + messageNumber->dp[i]; }
@@ -184,8 +184,9 @@ for(i=0;i<used;i++) {
 otherNumber->dp[i] = messagePoint->x[i] - otherPoint->x[i];
 }
 otherNumber->used = used;
-size = MESSAGESIZE; t = 1;
-debug_bn_write_bin(otherMessage, &size,&t,otherNumber);
+int t1;
+size = MESSAGESIZE; t1 = 1;
+debug_bn_write_bin(otherMessage, &size,&t1,otherNumber);
 fwrite(&otherMessage, sizeof(char), (MESSAGESIZE-1), saida);
 }
 }
@@ -203,4 +204,4 @@ fclose(entrada); fclose(saida);
 end_time = clock();
 printf("Execution time was %lu miliseconds\n", (end_time - start_time)/(CLOCKS_PER_SEC/1000));
 core_clean(); return 0;
-}
+}}
