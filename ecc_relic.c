@@ -1,7 +1,10 @@
 #include <stdio.h>
-#include "/usr/local/include/relic/relic.h"
+#include "relic.h"
+//#include "/usr/local/include/relic/low/relic_fp_low.h"
+//#include <relic.h>
 #include <time.h>
 #define MESSAGESIZE 40
+
 bn_t privKey;
 ep_t myPublicKey;
 void write_bn(FILE *out, bn_t source) { //Realiza a escrita do número source do tipo bn_t no arquivo out.
