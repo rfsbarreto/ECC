@@ -75,6 +75,25 @@ void keysInit() { //Representa a criação das chaves
 	ep_new(myPublicKey);
 	ep_mul_gen(myPublicKey, privKey);
 }
+int desc(ep_t auxPoint,ep_t messagePoint,ep_t otherPoint,bn_t otherNumber,bn_t n, int used,int size,unsigned char* otherMessage,FILE*saida){
+	ep_mul_basic(auxPoint,myPublicKey,privKey);
+	ep_sub_basic(messagePoint,messagePoint,auxPoint);
+	ep_null(otherPoint);
+	ep_new(otherPoint);
+	ep_curve_get_gen(otherPoint);
+	bn_new(otherNumber);
+	bn_rand(otherNumber,BN_POS, bn_bits(n));
+	int i;
+	for(i=0;i<used;i++) {
+		otherNumber->dp[i] = messagePoint->x[i] - otherPoint->x[i];
+	}
+	otherNumber->used = used;
+	int t1;
+	size = MESSAGESIZE; t1 = 1;
+	debug_bn_write_bin(otherMessage, &size,&t1,otherNumber);
+	printf("result: %s",otherMessage);
+	fwrite(&otherMessage, sizeof(char), (MESSAGESIZE-1), saida);
+}
 int main(int argc, char *argv[]) {
 	ep_t a, b, c, t, publicPoint, auxPoint, messagePoint, otherPoint;
 	bn_t privNumber, messageNumber, otherNumber, n;
@@ -150,8 +169,8 @@ int main(int argc, char *argv[]) {
 						ep_add_basic(messagePoint,auxPoint,messagePoint);
 						fwrite(&(messageNumber->used), sizeof(int), 1, saida);
 						write_ep(saida, messagePoint);
-						printf("%s",messagePoint);
-						printf("a");
+						//printf("%s",messagePoint);
+						printf("a2");
 						for(i = 0; i < MESSAGESIZE; i++) { message[i] = '\0'; }
 					}
 				}
@@ -171,9 +190,9 @@ int main(int argc, char *argv[]) {
 				ep_add_basic(messagePoint,auxPoint,messagePoint);
 				fwrite(&(messageNumber->used), sizeof(int), 1, saida);
 				write_ep(saida, messagePoint);
-				printf("%s",messagePoint);
-						printf("a");
-
+				//printf("%s",messagePoint);
+						printf("a1k");
+				desc(auxPoint,messagePoint,otherPoint,otherNumber, n,messageNumber->used,size,otherMessage,saida) ;
 			}
 			else if (argv[1][0] == 'D') {
 				while (!feof(entrada)) {
